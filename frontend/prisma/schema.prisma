@@ -1,0 +1,45 @@
+// DeepShield Forensic Audit Schema (Project ID: MCA21491)
+// Supports PostgreSQL in production and SQLite for zero-config local execution
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MediaAuditLog {
+  id                  String   @id @default(cuid())
+  auditCode           String   @unique
+  filename            String
+  mediaType           String   // "Image" | "Video Frame"
+  facialRegion        String   // "Ocular & Periocular" | "Perioral" | "Jawline Blending"
+  compressionLevel    String   // "Raw" | "JPEG Q85" | "H.264 Social"
+  generatorCategory   String   // "GAN" | "Diffusion" | "Face-Swap" | "Authentic"
+  spatialScoreSMS     Float
+  frequencyScoreFAS   Float
+  efficientNetScore   Float
+  vitAttentionScore   Float
+  authenticityProb    Float
+  verdict             String
+  inferenceLatencyMs  Float
+  gradCamGenerated    Boolean  @default(true)
+  createdAt           DateTime @default(now())
+
+  @@index([verdict])
+  @@index([createdAt])
+}
+
+model BenchmarkEvaluation {
+  id           String   @id @default(cuid())
+  modelName    String
+  sampleCount  Int      @default(1000)
+  accuracy     Float
+  precision    Float
+  recall       Float
+  f1Score      Float
+  rocAuc       Float
+  evaluatedAt  DateTime @default(now())
+}
